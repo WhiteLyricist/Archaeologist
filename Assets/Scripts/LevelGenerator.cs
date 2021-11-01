@@ -98,8 +98,8 @@ public class LevelGenerator : MonoBehaviour
         _maxGridRows = Mathf.FloorToInt(_background.transform.localScale.y / _offsetY - 1); //Максимальное кол-во строчек в зависимости от размера поля.
         _maxGridColumns = Mathf.FloorToInt(_background.transform.localScale.x / _offsetX); //Максимальное кол-во столбцов в зависимости от размера поля.
 
-        gridRows = Parameters.GridRows; //Параметры берущиеся из настроек, можно отключить если настроек нет.
-        gridColumns = Parameters.GridColumns; //Параметры берущиеся из настроек, можно отключить если настроек нет.
+        gridRows = (Parameters.isNewGame)? Parameters.GridRows : gridRows; //Параметры берущиеся из настроек, можно отключить если настроек нет. 
+        gridColumns = (Parameters.isNewGame)? Parameters.GridColumns : gridColumns; //Параметры берущиеся из настроек, можно отключить если настроек нет.
 
         gridRows = Mathf.Clamp(gridRows, _minGridRows, _maxGridRows); //Ограничения для кол-ва строк между минимальным и максимальным значением.
         gridColumns = Mathf.Clamp(gridColumns, _minGridColumns, _maxGridColumns); //Ограничения для кол-ва столбцов между минимальным и максимальным значением.
@@ -131,6 +131,7 @@ public class LevelGenerator : MonoBehaviour
     void OnLoadGame()
     {
         var ld = PlayerPrefs.GetString("levelData", "");
+
         if (!string.IsNullOrEmpty(ld) && !Parameters.isNewGame)
         {
             var levelData = JsonUtility.FromJson<LevelData>(ld);

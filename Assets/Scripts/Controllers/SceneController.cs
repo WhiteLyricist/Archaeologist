@@ -25,6 +25,11 @@ public class SceneController : MonoBehaviour
         SaveGame();
     }
 
+    public void ParamatersSave() 
+    {
+        SaveGame();
+    }
+
     public void ExitMenu() 
     {
         Parameters.isNewGame = true;
