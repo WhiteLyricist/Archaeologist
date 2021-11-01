@@ -11,19 +11,23 @@ public class SceneController : MonoBehaviour
 
     private void Start()
     {
+        LoadGame();
         UIController.Menu += OnMenu;
     }
 
     private void OnApplicationPause(bool pause) //OnApplicationFocuse
     {
-        Parameters.isNewGame = false;
+        SaveGame();
+    }
+
+    private void OnApplicationQuit()
+    {
         SaveGame();
     }
 
     public void ExitMenu() 
     {
-        Parameters.isNewGame = false;
-        SaveGame();
+        Parameters.isNewGame = true;
         SceneManager.LoadScene("Menu");
     }
 
@@ -35,8 +39,6 @@ public class SceneController : MonoBehaviour
 
     public void OnLoadGame() 
     {
-        Parameters.isNewGame = false;
-        LoadGame();
         SceneManager.LoadScene("Game");
     }
 

@@ -62,19 +62,21 @@ public class ItemController : MonoBehaviour
         get => isActiveFound;
     }
 
-    void Start()
+    private void Awake()
     {
-        _numberGoldBar = Parameters.NumberGoldBar;
-        _numberShovel = Parameters.NumberShovel;
-
-        _maxNumberShovel = Parameters.GridColumns * Parameters.GridRows;
-
-        _numberShovel = Mathf.Clamp(_numberShovel, _minNumberShovel, _maxNumberShovel);
-
         CellController.Dig += OnDig;
         SceneController.SaveGame += OnSaveGame;
         SceneController.LoadGame += OnLoadGame;
         UIController.EndGame += OnEndGame;
+    }
+
+    void Start()
+    { 
+        _numberGoldBar = Parameters.NumberGoldBar;
+
+        _maxNumberShovel = Parameters.GridColumns * Parameters.GridRows;
+
+        _numberShovel = Mathf.Clamp(_numberShovel, _minNumberShovel, _maxNumberShovel);
     }
 
     void OnDig(bool found, Vector2 position) 
@@ -87,20 +89,19 @@ public class ItemController : MonoBehaviour
         { 
             if (_numberGoldBar >= 1)
             {
-                StartCoroutine(Found(position));
+                StartCoroutine(Found(position, 0.5f));
                 _numberGoldBar--;
             }
             if (_numberGoldBar == 0)
             {
-                Debug.Log("Нашли все");
                 isActiveFound = false;
             }
         }
     }
 
-    private IEnumerator Found(Vector2 position)
+    private IEnumerator Found(Vector2 position, float time)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(time);
 
         _goldBar = Instantiate(_goldBarPrefab) as GameObject;
         _goldBar.transform.position = position;
@@ -146,6 +147,20 @@ public class ItemController : MonoBehaviour
 
     void OnLoadGame() 
     {
+        if (Parameters.isNewGame) 
+        {
+            OnEndGame();
+
+            _numberShovel = Parameters.NumberShovel;
+
+            Digging(_numberShovel);
+
+            isActiveDig = false;
+            isActiveFound = true;
+
+            return;
+        }
+
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("GoldBar"))
         {
             Destroy(go);
@@ -158,9 +173,7 @@ public class ItemController : MonoBehaviour
             var itemData = JsonUtility.FromJson<ItemData>(ld);
 
             _numberGoldBar = itemData.NumberGoldBar;
-
             _numberShovel = itemData.NumberShovel;
-            _numberShovel = Mathf.Clamp(_numberShovel, _minNumberShovel, _maxNumberShovel);
 
             isActiveDig = itemData.isctiveDig;
             isActiveFound = itemData.isActiveFound;
@@ -169,12 +182,12 @@ public class ItemController : MonoBehaviour
 
             foreach (Vector2 gbPosition in itemData.GoldBarPositions)
             {
-                _goldBar = Instantiate(_goldBarPrefab) as GameObject;
-                _goldBar.transform.position = gbPosition;
-                _goldBar.SetActive(true);
+                StartCoroutine(Found(gbPosition, 0.005f));
             }
         }
     }
+
+
 
     void OnEndGame() 
     {

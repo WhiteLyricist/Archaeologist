@@ -25,9 +25,8 @@ public class UIController : MonoBehaviour
 
     void Start()
     {
-        _numberShovel = Parameters.NumberShovel;
-
         _bagText.text = _numberGoldBar.ToString();
+
         _shovelText.text = _numberShovel.ToString();
 
         GoldBarController.PlacedInBag += OnPlacedInBag;
@@ -49,6 +48,8 @@ public class UIController : MonoBehaviour
 
             EndGame();
 
+            Parameters.isNewGame = true;
+
             PlayerPrefs.DeleteKey("numberGoldBar");
             PlayerPrefs.Save();
         }
@@ -60,6 +61,8 @@ public class UIController : MonoBehaviour
         _losing.gameObject.SetActive(true);
 
         EndGame();
+
+        Parameters.isNewGame = true;
 
         PlayerPrefs.DeleteKey("numberGoldBar");
         PlayerPrefs.Save();
@@ -78,7 +81,14 @@ public class UIController : MonoBehaviour
 
     void OnLoadGame() 
     {
-        _numberGoldBar = PlayerPrefs.GetInt("numberGoldBar", Parameters.NumberGoldBar);
+        if (Parameters.isNewGame) 
+        {
+            _numberGoldBar = 0;
+            _bagText.text = _numberGoldBar.ToString();
+
+            return;
+        }
+        _numberGoldBar = PlayerPrefs.GetInt("numberGoldBar", 0);
         _bagText.text = _numberGoldBar.ToString();
     }
 
@@ -93,6 +103,9 @@ public class UIController : MonoBehaviour
 
     public void ExitToTheMenu() 
     {
+        PlayerPrefs.DeleteKey("numberGoldBar");
+        PlayerPrefs.Save();
+
         Menu();
     }
 }

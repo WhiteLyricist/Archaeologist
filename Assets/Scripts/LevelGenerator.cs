@@ -57,15 +57,6 @@ public class LevelGenerator : MonoBehaviour
         SceneController.SaveGame += OnSaveGame;
         SceneController.LoadGame += OnLoadGame;
         UIController.EndGame += OnEndGame;
-
-        if (!Parameters.isNewGame && PlayerPrefs.HasKey("levelData")) 
-        {
-            OnLoadGame();
-
-            return;
-        }
-        
-        Generator();
     }
 
     void Generator(List<int> DepthData = null)
@@ -137,10 +128,10 @@ public class LevelGenerator : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    void OnLoadGame() 
+    void OnLoadGame()
     {
         var ld = PlayerPrefs.GetString("levelData", "");
-        if (!string.IsNullOrEmpty(ld))
+        if (!string.IsNullOrEmpty(ld) && !Parameters.isNewGame)
         {
             var levelData = JsonUtility.FromJson<LevelData>(ld);
 
@@ -149,7 +140,11 @@ public class LevelGenerator : MonoBehaviour
 
             Generator(levelData.DepthData);
         }
-        else Generator();
+        else
+        {
+            OnEndGame();
+            Generator();
+        }
     }
 
     void OnEndGame() 
