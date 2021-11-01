@@ -1,0 +1,54 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class SceneController : MonoBehaviour
+{
+    public static Action SaveGame = delegate { };
+    public static Action LoadGame = delegate { };
+
+    private void Start()
+    {
+        UIController.Menu += OnMenu;
+    }
+
+    private void OnApplicationPause(bool pause) //OnApplicationFocuse
+    {
+        Parameters.isNewGame = false;
+        SaveGame();
+    }
+
+    public void ExitMenu() 
+    {
+        Parameters.isNewGame = false;
+        SaveGame();
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void NewGame() 
+    {
+        Parameters.isNewGame = true;
+        SceneManager.LoadScene("Game");
+    }
+
+    public void OnLoadGame() 
+    {
+        Parameters.isNewGame = false;
+        LoadGame();
+        SceneManager.LoadScene("Game");
+    }
+
+    void OnMenu() 
+    {
+        Parameters.isNewGame = false;
+        SaveGame();
+        SceneManager.LoadScene("Menu");
+    }
+
+    private void OnDestroy()
+    {
+        UIController.Menu -= OnMenu;
+    }
+}
